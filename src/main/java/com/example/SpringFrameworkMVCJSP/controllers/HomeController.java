@@ -1,6 +1,9 @@
 package com.example.SpringFrameworkMVCJSP.controllers;
 
+import com.example.SpringFrameworkMVCJSP.daos.AlienDAO;
 import com.example.SpringFrameworkMVCJSP.models.Alien;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/")
 public class HomeController {
+	@Autowired
+	private AlienDAO dao;
 
     // @ModelAttribute methods are executed first (before the mapping methods)
     @ModelAttribute
@@ -18,6 +23,18 @@ public class HomeController {
     @GetMapping
     public String home() {
         return "index";
+    }
+    
+    @GetMapping("aliens")
+    public String getAll(Model model) {
+    	model.addAttribute("aliens", dao.getAll());
+    	return "aliens";
+    }
+    
+    @GetMapping("aliens/{id}")
+    public String getAlien(@PathVariable("id") int id, Model model) {
+    	model.addAttribute("alien", dao.getById(id));
+    	return "show";
     }
 
 //    @PostMapping("sum")
@@ -70,11 +87,12 @@ public class HomeController {
 //        return "result";
 //    }
 
-    @PostMapping("add")
+    @PostMapping("aliens")
     // If @ModelAttribute("name") is set "name" is how it can be accessed in the view
     // If not, the attribute can be accessed with the class name
+    // @ModelAttribute adds the attribute (alien) automatically to the model
     public String add(@ModelAttribute Alien alien) {
-        // @ModelAttribute adds the attribute (alien) automatically to the model
-        return "result";
+    	dao.addAlien(alien);
+        return "show";
     }
 }
